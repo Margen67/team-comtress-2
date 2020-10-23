@@ -972,10 +972,10 @@ void DebugDrawLightmapAtCrossHair()
 	IMaterial *pMaterial;
 	int lightmapPageSize[2];
 
-	if( s_CrossHairSurfID <= 0 )
-	{
-		return;
-	}
+//	if( s_CrossHairSurfID <= 0 )
+//	{
+//		return;
+//	}
 	materials->GetLightmapPageSize( materialSortInfoArray[MSurf_MaterialSortID( s_CrossHairSurfID )].lightmapPageID, 
 		&lightmapPageSize[0], &lightmapPageSize[1] );
 	pMaterial = MSurf_TexInfo( s_CrossHairSurfID )->material;
