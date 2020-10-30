@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 # NOTE: Do not set -e, some cp commands fail because they don't overwrite existing files, which we want
+git submodule update --init
+
 cd "$(dirname "$0")" || exit 1
 
 if [[ -n "$1" ]]; then
