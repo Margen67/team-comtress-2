@@ -54,7 +54,14 @@ jobs:
         run: |
           reg add "HKLM\SOFTWARE\WOW6432Node\Microsoft\VisualStudio\10.0\Projects\{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}" /v DefaultProjectExtension /t REG_SZ /d vcproj /f
           ${{ matrix.creategameprojects }}
-          Get-Content .\devtools\bin\sln_fix.txt | Add-Content .\games.sln
+          $installationPath = vswhere -prerelease -latest -property installationPath
+          If ($installationPath -and (Test-Path "$installationPath\Common7\Tools\vsdevcmd.bat")) {
+            & "${env:COMSPEC}" /s /c "`"$installationPath\Common7\Tools\vsdevcmd.bat`" -no_logo && set" | ForEach {
+              $name, $value = $_ -split '=', 2
+              Set-Content env:\"$name" $value
+            }
+          }
+          devenv games.sln /upgrade
           # Set C(++) standard to 17 in a hacky way
           Get-ChildItem -r -include "*.vc*proj" |
            % { $a = $_.fullname; ( gc $a ) |
