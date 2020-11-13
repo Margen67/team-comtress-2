@@ -22,13 +22,18 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        configuration: [Release, Debug]
+        type: [normal, dev, debug]
         game: [cstrike, dod, episodic, hl1, hl1mp, hl2, hl2mp, lostcoast, portal, sdk, tf]
         include:
-          - configuration: Release
-            creategameprojects: .\creategameprojects_${{ matrix.game }}_dev.bat
-          - configuration: Debug
-            creategameprojects: .\creategameprojects_${{ matrix.game }}_debug.bat
+          - type: normal
+            configuration: Release
+            suffix: .bat
+          - type: dev
+            configuration: Release
+            suffix: _dev.bat
+          - type: debug
+            configuration: Debug
+            suffix: _debug.bat
     steps:
       - uses: actions/checkout@v2
         with:
@@ -54,7 +59,7 @@ jobs:
       - name: Create game projects
         run: |
           reg add "HKLM\SOFTWARE\WOW6432Node\Microsoft\VisualStudio\10.0\Projects\{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}" /v DefaultProjectExtension /t REG_SZ /d vcproj /f
-          ${{ matrix.creategameprojects }}
+          .\creategameprojects_${{ matrix.game }}${{ matrix.suffix }}
           $installationPath = vswhere -prerelease -latest -property installationPath
           If ($installationPath -and (Test-Path "$installationPath\Common7\Tools\vsdevcmd.bat")) {
             & "${env:COMSPEC}" /s /c "`"$installationPath\Common7\Tools\vsdevcmd.bat`" -no_logo && set" | ForEach {
@@ -74,7 +79,7 @@ jobs:
         id: artifact
         run: echo "::set-output name=path::$((Resolve-Path ..\game).Path)"
       - name: Upload bin artifact(s)
-        if: matrix.configuration == 'Release'
+        if: matrix.type == 'normal'
         uses: actions/upload-artifact@v2
         with:
           name: tc2_${{ matrix.game}}-${{ runner.os }}_bin
@@ -84,7 +89,7 @@ jobs:
             !\**\*.pdb
           if-no-files-found: error
       - name: Upload game_clean artifact(s)
-        if: matrix.configuration == 'Release'
+        if: matrix.type == 'normal' && matrix.game == 'tf'
         uses: actions/upload-artifact@v2
         with:
           name: tc2_${{ runner.os }}_game_clean
