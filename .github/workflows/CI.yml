@@ -23,11 +23,12 @@ jobs:
       fail-fast: false
       matrix:
         configuration: [Release, Debug]
+        game: [cstrike, dod, episodic, hl1, hl1mp, hl2, hl2mp, lostcoast, portal, sdk, tf]
         include:
           - configuration: Release
-            creategameprojects: .\creategameprojects_dev.bat
+            creategameprojects: .\creategameprojects_${{ matrix.game }}_dev.bat
           - configuration: Debug
-            creategameprojects: .\creategameprojects_debug.bat
+            creategameprojects: .\creategameprojects_${{ matrix.game }}_debug.bat
     steps:
       - uses: actions/checkout@v2
         with:
@@ -76,7 +77,7 @@ jobs:
         if: matrix.configuration == 'Release'
         uses: actions/upload-artifact@v2
         with:
-          name: tc2_${{ runner.os }}_bin
+          name: tc2_${{ matrix.game}}-${{ runner.os }}_bin
           path: |
             ${{ steps.artifact.outputs.path }}
             !\**\*.dat
@@ -89,13 +90,14 @@ jobs:
           name: tc2_${{ runner.os }}_game_clean
           path: game_clean
           if-no-files-found: error
-      - name: Upload pdb artifact(s)
-        if: matrix.configuration == 'Release'
-        uses: actions/upload-artifact@v2
-        with:
-          name: tc2_${{ runner.os }}_pdb
-          path: ${{ steps.artifact.outputs.path }}\**\*.pdb
-          if-no-files-found: error
+      #skip this because it's probably too big
+      #- name: Upload pdb artifact(s)
+      #  if: matrix.configuration == 'Release'
+      #  uses: actions/upload-artifact@v2
+      #  with:
+      #    name: tc2_${{ runner.os }}_pdb
+      #    path: ${{ steps.artifact.outputs.path }}\**\*.pdb
+      #    if-no-files-found: error
 
 #TODO: Add Linux builds
   #build-linux:
