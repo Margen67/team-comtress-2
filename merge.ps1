@@ -1,6 +1,6 @@
 $ErrorActionPreference = "Stop"
 
-git reset --hard 
+git reset --hard f6a122417232670b21b1eef231d0345259eba798
 
 $branches              = @(
     "typos"               ;
