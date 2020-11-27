@@ -4697,7 +4697,8 @@ CEconItemView *CTFPlayer::GetLoadoutItem( int iClass, int iSlot, bool bReportWhi
 			return pItem;
 	}
 
-	if ( TFGameRules()->IsInTraining() || TFGameRules()->IsInItemTestingMode() )
+	extern ConVar training_can_equip_nonstock;
+	if ( ( TFGameRules()->IsInTraining() && ( ( !IsWearableSlot( iSlot ) && training_can_equip_nonstock.GetInt() == 1 ) || !training_can_equip_nonstock.GetBool() ) ) || TFGameRules()->IsInItemTestingMode() )
 	{
 		CTFInventoryManager *pInventoryManager = TFInventoryManager();
 		return pInventoryManager->GetBaseItemForClass( iClass, iSlot );
@@ -5972,6 +5973,12 @@ void CTFPlayer::HandleCommand_JoinTeam( const char *pTeamName )
 	if ( TFGameRules()->State_Get() == GR_STATE_GAME_OVER )
 		return;
 
+	if ( TFGameRules() && TFGameRules()->IsInTraining() && !IsFakeClient() )
+	{
+		ClientPrint( this, HUD_PRINTCENTER, "#TF_CantChangeTeamNow" );
+		return;
+	}
+
 	if ( GetTeamNumber() == TF_TEAM_RED || GetTeamNumber() == TF_TEAM_BLUE )
 	{
 		const IMatchGroupDescription* pMatchDesc = GetMatchGroupDescription( TFGameRules()->GetCurrentMatchGroup() );
@@ -7124,6 +7131,12 @@ bool CTFPlayer::ClientCommand( const CCommand &args )
 			return true;
 
 		SetNextChangeClassTime( gpGlobals->curtime + 0.5 );  // limit to one change every 0.5 secs
+
+	 	if ( TFGameRules() && TFGameRules()->IsInTraining() && !IsFakeClient() )
+	 	{
+	 		ClientPrint( this, HUD_PRINTCENTER, "#TF_CantChangeClassNow" );
+	 		return true;
+	 	}
 
 		if ( tf_arena_force_class.GetBool() == false )
 		{

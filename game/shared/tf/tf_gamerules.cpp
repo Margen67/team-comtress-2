@@ -385,6 +385,7 @@ ConVar training_can_select_weapon_building	( "training_can_select_weapon_buildin
 ConVar training_can_select_weapon_pda		( "training_can_select_weapon_pda", "1", FCVAR_REPLICATED, "In training player select pda." );
 ConVar training_can_select_weapon_item1		( "training_can_select_weapon_item1", "1", FCVAR_REPLICATED, "In training player select item 1." );
 ConVar training_can_select_weapon_item2		( "training_can_select_weapon_item2", "1", FCVAR_REPLICATED, "In training player select item 2." );
+ConVar training_can_equip_nonstock			( "training_can_equip_nonstock", "1", FCVAR_CHEAT | FCVAR_REPLICATED, "In training player equip non-stock." );
 
 ConVar tf_birthday_ball_chance( "tf_birthday_ball_chance", "100", FCVAR_REPLICATED, "Percent chance of a birthday beach ball spawning at each round start" );
 
@@ -4102,6 +4103,7 @@ void CTFGameRules::Activate()
 		m_bIsInTraining.Set( true );
 		m_bAllowTrainingAchievements.Set( false );
 		mp_humans_must_join_team.SetValue( "blue" );
+		mp_allowspectators.SetValue( "0.0" );
 		m_bIsTrainingHUDVisible.Set( true );
 		tf_training_client_message.SetValue( (int)TRAINING_CLIENT_MESSAGE_NONE );
 	}
@@ -7601,6 +7603,7 @@ void CTFGameRules::LevelShutdown()
 	if ( IsInTraining() )
 	{
 		mp_humans_must_join_team.SetValue( "any" );
+		mp_allowspectators.SetValue( "1.0" );
 		training_can_build_sentry.Revert();
 		training_can_build_dispenser.Revert();
 		training_can_build_tele_entrance.Revert();
